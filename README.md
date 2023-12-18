@@ -13,19 +13,22 @@ Ce tutoriel nécessite l'installation préalable de plusieurs logiciels :
 kubectl version
 ```
 `Client Version: v1.29.0`
-![[SCR-20231218-jqug.png]]
+
+![assets/SCR-20231218-jqug.png](assets/SCR-20231218-jqug.png)
 
 2. Création d'un cluster sur Kubernetes
 ```bash
 minikube start --memory=8192 --cpus=4 --kubernetes-version=<k8s-version>
 ```
-![[SCR-20231218-jrcq.png]]
+
+![assets/SCR-20231218-jrcq.png](assets/SCR-20231218-jrcq.png)
 
 3. Informer Kubernetes de l'utilisation de Minikube
 ```bash
 kubectl config use-context minikube
 ```
-![[SCR-20231218-jrrk.png]]
+
+![assets/SCR-20231218-jrrk.png](assets/SCR-20231218-jrrk.png)
 
 ## Installation de Pulsar Helm
 
@@ -38,7 +41,8 @@ cd pulsar-helm-chart
 
 ./scripts/pulsar/prepare_helm_release.sh -n pulsar -k pulsar-mini -c
 ```
-![[SCR-20231218-julm.png]]
+
+![assets/SCR-20231218-julm.png](assets/SCR-20231218-julm.png)
 Le script `prepare_helm_release.sh` permet de créer les `secrets tokens` nécessaires à Pulsar.
 *When running the script, you can use `-n` to specify the Kubernetes namespace where the Pulsar Helm chart is installed, `-k` to define the Pulsar Helm release name, and `-c` to create the Kubernetes namespace. For more information about the script, run `./scripts/pulsar/prepare_helm_release.sh --help`.*
 [Source](https://pulsar.apache.org/docs/3.1.x/getting-started-helm/)
@@ -47,20 +51,24 @@ Le script `prepare_helm_release.sh` permet de créer les `secrets tokens` néces
 ```bash
 helm install --values examples/values-minikube.yaml --namespace pulsar pulsar-mini apache/pulsar
 ```
-![[SCR-20231218-jwsd.png]]
+
+![assets/SCR-20231218-jwsd.png](assets/SCR-20231218-jwsd.png)
 
 3. Vérification de l'état des `pods` (attention, il faut attendre que les `pods` aient status `RUNNING` ou `COMPLETED`). Il aura fallut 2 min pour que tous les `pods` soient prêt à l'utilisation, mais cela peut être plus long en fonction de la configuration de l'ordinateur.
 ```bash
 kubectl get pods -n pulsar
 ```
-![[SCR-20231218-kbvv.png]]
-*En cas de problème, la commande `helm delete pulsar-mini --namespace pulsar` permet de tuer les `pods` afin de recommencer.*![[SCR-20231218-kawn.png]]
+
+![assets/SCR-20231218-kbvv.png](assets/SCR-20231218-kbvv.png)
+*En cas de problème, la commande `helm delete pulsar-mini --namespace pulsar` permet de tuer les `pods` afin de recommencer.*
+![assets/SCR-20231218-kawn.png](assets/SCR-20231218-kawn.png)
 
 4. Vérification de l'état des services
 ```bash
 kubectl get services -n pulsar
 ```
-![[SCR-20231218-kcqc.png]]
+
+![assets/SCR-20231218-kcqc.png](assets/SCR-20231218-kcqc.png)
 
 ## Pulsar-admin : Initialisation du système et création d'un topic
 
@@ -69,7 +77,8 @@ kubectl get services -n pulsar
 ```bash
 kubectl exec -it -n pulsar pulsar-mini-toolset-0 -- /bin/bash
 ```
-![[SCR-20231218-kdqk.png]]
+
+![assets/SCR-20231218-kdqk.png](assets/SCR-20231218-kdqk.png)
 
 2. À l'intérieur du container, création d'un `TENANT`
    *Pulsar was created from the ground up as a multi-tenant system. To support multi-tenancy, Pulsar has a concept of tenants. Tenants can be spread across clusters and can each have their own [authentication and authorization](https://pulsar.apache.org/docs/3.1.x/security-overview/) scheme applied to them. They are also the administrative unit at which storage quotas, [message TTL](https://pulsar.apache.org/docs/3.1.x/cookbooks-retention-expiry/#time-to-live-ttl), and isolation policies can be managed.*
@@ -82,18 +91,21 @@ bin/pulsar-admin tenants create apache
 ```bash
 bin/pulsar-admin tenants list
 ```
-![[SCR-20231218-kfor.png]]
+
+![assets/SCR-20231218-kfor.png](assets/SCR-20231218-kfor.png)
 4. Création du namespace, à l'intérieur de `apache`
 ```bash
 bin/pulsar-admin namespaces create apache/pulsar
 bin/pulsar-admin namespaces list apache
 ```
-![[SCR-20231218-kgas.png]]
+
+![assets/SCR-20231218-kgas.png](assets/SCR-20231218-kgas.png)
 5. Création d'un `topic`
 ```bash
 bin/pulsar-admin topics create-partitioned-topic apache/pulsar/test-topic -p 4
 ```
-![[SCR-20231218-kgon.png]]
+
+![assets/SCR-20231218-kgon.png](assets/SCR-20231218-kgon.png)
 
 ## Test du topic : Génération & Réception de messages
 
@@ -103,7 +115,8 @@ bin/pulsar-admin topics create-partitioned-topic apache/pulsar/test-topic -p 4
 ```bash
 kubectl get services -n pulsar | grep pulsar-mini-proxy
 ```
-![[Pasted image 20231218111944.png]]
+
+![assets/Pasted image 20231218111944.png](assets/Pasted image 20231218111944.png)
 Dans notre exemple, la partie `80:31580/TCP,6650:30454/TCP` indique que:
 - Le **port 31580** est renvoyé vers le **port 80** (accès HTTP)
 - Le **port 30454** est renvoyé vers le **port 6650** (accès Binaire)
@@ -112,7 +125,8 @@ Dans notre exemple, la partie `80:31580/TCP,6650:30454/TCP` indique que:
 ```bash
 minikube service pulsar-mini-proxy -n pulsar
 ```
-![[SCR-20231218-kjdl.png]]
+
+![assets/SCR-20231218-kjdl.png](assets/SCR-20231218-kjdl.png)
 Nous avons ici l'URL à utiliser pour connecter nos clients à notre serveur Pulsar.
 ```yaml
 webServiceUrl=http://127.0.0.1:52660/
@@ -138,13 +152,15 @@ export PULSAR_HOME=$(pwd)
 ```
 5. Configurez le client de test. Pour cela, modifiez le fichier `${PULSAR_HOME}/conf/client.conf` en remplaçant les adresses `webServiceUrl` et `brokerServiceUrl` afin qu'elles correspondent aux adresses précédemment récupérées.
 
-![[SCR-20231218-kmzb.png]]
+
+![assets/SCR-20231218-kmzb.png](assets/SCR-20231218-kmzb.png)
 
 6. Créez un `consumer` de messages. Le consommateur de message se lance et se met en attente de messages. Il est abonné à un topic `test-topic` que nous avons créé précédemment.
 ```bash
 bin/pulsar-client consume -s sub apache/pulsar/test-topic  -n 0
 ```
-![[Pasted image 20231218113803.png]]
+
+![assets/Pasted image 20231218113803.png](assets/Pasted image 20231218113803.png)
 *Au lancement, vous devriez obtenir une ligne : `[sub] Success subscribe new topic persistent://apache/pulsar/test-topic in topics consumer, partitions: 4, allTopicPartitionsNumber: 4`*
 
 *Laissez ce terminal et ouvrez en un nouveau pour la suite*
@@ -156,9 +172,11 @@ bin/pulsar-client produce apache/pulsar/test-topic  -m "---------hello apache pu
 
 8. Vérifiez la transmission :
    Dans le terminal du `producer` : `10 messages successfully produced`
-   ![[Pasted image 20231218114413.png]]
+   
+![assets/Pasted image 20231218114413.png](assets/Pasted image 20231218114413.png)
    Dans le terminal du `consummer`: Réception des messages transmis
-   ![[SCR-20231218-kpqy.png]]
+   
+![assets/SCR-20231218-kpqy.png](assets/SCR-20231218-kpqy.png)
 
 
 
@@ -177,7 +195,7 @@ Le projet présenté ici permet de tester la communication entre deux objets Jav
 
 1. Téléchargez le projet sur GitHub
 ```bash
-git clone 
+git clone https://github.com/TheCodingHornet/PulsarPingPong
 ```
 
 2. Importez le projet dans votre IDE préféré (ici, IntelliJ)
